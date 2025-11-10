@@ -1,13 +1,6 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 
-
 project_name: sshw
-
-metadata:
-  homepage: https://github.com/sshw/sshw
-  license: MIT
-  maintainers:
-    - "yinheli <me@yinheli.com>"
 
 builds:
   - binary: sshw
@@ -24,12 +17,9 @@ builds:
       - windows
       - darwin
       - linux
-      - freebsd
-      - openbsd
-      - solaris
     goarch:
       - amd64
-      - 386
+      - "386"
       - arm
       - arm64
       - mips
@@ -37,17 +27,15 @@ builds:
       - mips64
       - mips64le
     goarm:
-      - 7
-      - 6
+      - "7"
+      - "6"
     gomips:
       - hardfloat
       - softfloat
 
     ignore:
       - goos: darwin
-        goarch: 386
-      - goos: openbsd
-        goarch: arm
+        goarch: "386"
 
 archives:
   - id: sshw
@@ -57,5 +45,4 @@ archives:
       - goos: windows
         format: zip
     files:
-      - LICENSE
       - README.md
