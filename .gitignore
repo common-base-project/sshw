@@ -17,3 +17,5 @@
 .idea
 
 !.goreleaser.yml
+.DS_Store
+sshw-test
