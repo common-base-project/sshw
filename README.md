@@ -26,6 +26,9 @@ config file load in following order:
 - `./.sshw`
 - `./.sshw.yml`
 - `./.sshw.yaml`
+- `~/.ssh/config` (fallback if no `.sshw` config found)
+
+**Note**: If no `.sshw` configuration file is found, sshw will automatically fallback to reading `~/.ssh/config`. You can also force using SSH config by running `sshw -s`.
 
 config example:
 

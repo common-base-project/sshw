@@ -74,12 +74,22 @@ func GetConfig() []*Node {
 func LoadConfig() error {
 	b, err := LoadConfigBytes(".sshw", ".sshw.yml", ".sshw.yaml")
 	if err != nil {
-		return err
+		// 如果没有找到 .sshw 配置文件，尝试加载 ~/.ssh/config
+		l.Info("no .sshw config found, trying to load ~/.ssh/config")
+		return LoadSshConfig()
 	}
 	var c []*Node
 	err = yaml.Unmarshal(b, &c)
 	if err != nil {
-		return err
+		// YAML 解析失败，尝试加载 ~/.ssh/config
+		l.Info("failed to parse .sshw config, trying to load ~/.ssh/config")
+		return LoadSshConfig()
+	}
+
+	// 如果配置为空，尝试加载 ~/.ssh/config
+	if len(c) == 0 {
+		l.Info(".sshw config is empty, trying to load ~/.ssh/config")
+		return LoadSshConfig()
 	}
 
 	config = c

@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSHW - SSH 客户端自动登录包装器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        header p {
+            font-size: 1.5em;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .badges {
+            margin-top: 20px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .badges img {
+            margin: 0 5px;
+            height: 20px;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .content-section h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content-section h3 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin: 30px 0 15px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .feature-card h3 {
+            color: white;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .feature-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .highlight-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .architecture-diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px solid #667eea;
+        }
+
+        .flow-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .flow-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .installation-steps {
+            counter-reset: step-counter;
+        }
+
+        .installation-step {
+            position: relative;
+            padding-left: 60px;
+            margin: 30px 0;
+        }
+
+        .installation-step::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            margin-top: 50px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .demo-gif {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin: 30px auto;
+            display: block;
+        }
+
+        ul {
+            list-style-position: inside;
+            margin: 15px 0;
+        }
+
+        li {
+            padding: 8px 0;
+            padding-left: 20px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 SSHW</h1>
+        <p>SSH 客户端自动登录包装器</p>
+        <div class="badges">
+            <img src="https://img.shields.io/github/license/yinheli/sshw" alt="License">
+            <img src="https://img.shields.io/github/v/tag/yinheli/sshw" alt="Version">
+            <img src="https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go" alt="Go Version">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 项目概述 -->
+        <section class="content-section">
+            <h2>📖 项目概述</h2>
+            <p style="font-size: 1.2em; line-height: 1.8;">
+                <strong>SSHW</strong> 是一个优雅的 SSH 客户端包装器，专为简化远程服务器管理而设计。
+                它提供交互式菜单界面，支持自动登录、密钥认证、跳板机连接等功能，让 SSH 连接变得简单高效。
+            </p>
+            
+            <div class="highlight-box">
+                <h4>🎯 核心价值</h4>
+                <ul>
+                    <li>✨ 告别繁琐的 SSH 命令记忆</li>
+                    <li>🔐 安全管理多个服务器凭证</li>
+                    <li>📁 分组组织服务器，层级清晰</li>
+                    <li>🚀 一键快速登录，提升效率</li>
+                    <li>🔍 智能搜索，快速定位目标服务器</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 核心特性 -->
+        <section class="content-section">
+            <h2>✨ 核心特性</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">🎨</div>
+                    <h3>交互式界面</h3>
+                    <p>美观的命令行界面，支持键盘导航和实时搜索，操作体验流畅自然</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔑</div>
+                    <h3>多种认证方式</h3>
+                    <p>支持密码、SSH 密钥、带密码短语的密钥等多种身份验证方式</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🌐</div>
+                    <h3>跳板机支持</h3>
+                    <p>轻松配置跳板机（Jump Host），实现多级 SSH 代理连接</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📂</div>
+                    <h3>分组管理</h3>
+                    <p>支持服务器分组，可创建多层级结构，便于管理大量服务器</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h3>快速登录</h3>
+                    <p>支持别名快速登录，命令行直接指定服务器别名即可连接</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔍</div>
+                    <h3>智能搜索</h3>
+                    <p>实时搜索服务器名称、用户名、主机地址，支持多关键词过滤</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🤖</div>
+                    <h3>回调命令</h3>
+                    <p>登录后自动执行预设命令，支持延时执行，实现自动化操作</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔄</div>
+                    <h3>SSH Config 集成</h3>
+                    <p>支持直接读取 ~/.ssh/config 文件，无缝兼容现有配置</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💪</div>
+                    <h3>终端完美适配</h3>
+                    <p>支持窗口大小自动调整、保持连接活跃、完整的终端特性</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术架构 -->
+        <section class="content-section">
+            <h2>🏗️ 技术架构</h2>
+            
+            <h3>技术栈</h3>
+            <div class="tech-stack">
+                <span class="tech-badge">Go 1.23+</span>
+                <span class="tech-badge">golang.org/x/crypto/ssh</span>
+                <span class="tech-badge">promptui (交互界面)</span>
+                <span class="tech-badge">gopkg.in/yaml.v2</span>
+                <span class="tech-badge">ssh_config</span>
+            </div>
+
+            <h3>核心模块</h3>
+            <div class="architecture-diagram">
+                <div class="flow-item">
+                    <div class="flow-number">1</div>
+                    <div>
+                        <strong>main.go</strong> - 程序入口，处理命令行参数，实现交互式菜单和服务器选择逻辑
+                    </div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">2</div>
+                    <div>
+                        <strong>config.go</strong> - 配置管理模块，支持 YAML 配置文件解析和 SSH Config 集成
+                    </div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">3</div>
+                    <div>
+                        <strong>client.go</strong> - SSH 客户端核心实现，处理连接、认证、终端交互和跳板机
+                    </div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">4</div>
+                    <div>
+                        <strong>log.go</strong> - 日志系统，提供统一的日志接口和格式化输出
+                    </div>
+                </div>
+            </div>
+
+            <h3>工作流程</h3>
+            <div class="installation-steps">
+                <div class="installation-step">
+                    <h4>启动程序</h4>
+                    <p>解析命令行参数（-version, -help, -s），加载配置文件或 SSH Config</p>
+                </div>
+                <div class="installation-step">
+                    <h4>配置加载</h4>
+                    <p>按优先级顺序查找配置文件（~/.sshw, ~/.sshw.yml, ./.sshw 等），解析 YAML 结构</p>
+                </div>
+                <div class="installation-step">
+                    <h4>别名快速登录</h4>
+                    <p>如果提供了别名参数，直接查找对应服务器节点并登录</p>
+                </div>
+                <div class="installation-step">
+                    <h4>交互式选择</h4>
+                    <p>显示服务器列表，支持键盘导航、实时搜索和多关键词过滤</p>
+                </div>
+                <div class="installation-step">
+                    <h4>认证连接</h4>
+                    <p>尝试多种认证方式（密钥→密码→交互式），支持跳板机代理连接</p>
+                </div>
+                <div class="installation-step">
+                    <h4>会话管理</h4>
+                    <p>建立 SSH 会话，执行回调命令，监控终端大小变化，发送保活心跳</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 安装指南 -->
+        <section class="content-section">
+            <h2>📦 安装指南</h2>
+            
+            <h3>方法一：使用 Go 安装（推荐）</h3>
+            <div class="code-block">
+                <pre>go install github.com/yinheli/sshw/cmd/sshw@latest</pre>
+            </div>
+
+            <h3>方法二：下载预编译二进制</h3>
+            <p>从 <a href="https://github.com/yinheli/sshw/releases" target="_blank" style="color: #667eea; font-weight: bold;">GitHub Releases</a> 页面下载适合你系统的版本</p>
+            <div class="code-block">
+                <pre># macOS / Linux
+chmod +x sshw
+sudo mv sshw /usr/local/bin/
+
+# 验证安装
+sshw -version</pre>
+            </div>
+        </section>
+
+        <!-- 配置详解 -->
+        <section class="content-section">
+            <h2>⚙️ 配置详解</h2>
+            
+            <h3>配置文件位置</h3>
+            <p>SSHW 按以下顺序查找配置文件（使用第一个找到的）：</p>
+            <div class="highlight-box">
+                <ol>
+                    <li><code>~/.sshw</code></li>
+                    <li><code>~/.sshw.yml</code></li>
+                    <li><code>~/.sshw.yaml</code></li>
+                    <li><code>./.sshw</code></li>
+                    <li><code>./.sshw.yml</code></li>
+                    <li><code>./.sshw.yaml</code></li>
+                    <li><code>~/.ssh/config</code> <span style="color: #667eea; font-weight: bold;">（自动回退）</span></li>
+                </ol>
+            </div>
+
+            <div class="success-box">
+                <h4>💡 智能配置加载</h4>
+                <p><strong>如果没有找到 .sshw 配置文件，程序会自动回退到读取 ~/.ssh/config</strong>。这意味着即使你没有创建专门的 .sshw 配置，也可以直接使用现有的 SSH 配置！</p>
+                <p>你也可以通过 <code>sshw -s</code> 命令强制使用 SSH Config 文件。</p>
+            </div>
+
+            <h3>配置项说明</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>配置项</th>
+                        <th>说明</th>
+                        <th>必填</th>
+                        <th>默认值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>name</code></td>
+                        <td>服务器显示名称</td>
+                        <td>✅</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>alias</code></td>
+                        <td>快速登录别名</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>host</code></td>
+                        <td>服务器地址或 IP</td>
+                        <td>✅</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>user</code></td>
+                        <td>登录用户名</td>
+                        <td>❌</td>
+                        <td>root</td>
+                    </tr>
+                    <tr>
+                        <td><code>port</code></td>
+                        <td>SSH 端口</td>
+                        <td>❌</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td><code>password</code></td>
+                        <td>登录密码</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>keypath</code></td>
+                        <td>私钥文件路径</td>
+                        <td>❌</td>
+                        <td>~/.ssh/id_rsa</td>
+                    </tr>
+                    <tr>
+                        <td><code>passphrase</code></td>
+                        <td>私钥密码短语</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>jump</code></td>
+                        <td>跳板机配置数组</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>children</code></td>
+                        <td>子服务器组</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>callback-shells</code></td>
+                        <td>登录后执行的命令</td>
+                        <td>❌</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>配置示例</h3>
+            
+            <h4>基本配置</h4>
+            <div class="code-block">
+                <pre># 完整配置
+- name: 生产服务器
+  user: appuser
+  host: 192.168.8.35
+  port: 22
+  password: 123456
+
+# 使用密钥
+- name: 开发服务器
+  user: appuser
+  host: 192.168.8.36
+  keypath: /root/.ssh/id_rsa
+
+# 带密码短语的密钥
+- name: 测试服务器
+  user: appuser
+  host: 192.168.8.37
+  keypath: /root/.ssh/id_rsa
+  passphrase: mySecretPhrase
+
+# 使用别名快速登录
+- name: 快速开发机
+  alias: dev
+  host: 192.168.8.38</pre>
+            </div>
+
+            <h4>服务器分组</h4>
+            <div class="code-block">
+                <pre># 按环境分组
+- name: 生产环境
+  children:
+    - name: Web 服务器 1
+      user: root
+      host: 192.168.1.10
+    - name: Web 服务器 2
+      user: root
+      host: 192.168.1.11
+    - name: 数据库服务器
+      user: dbadmin
+      host: 192.168.1.20
+
+- name: 开发环境
+  children:
+    - name: 开发机 1
+      user: developer
+      host: 192.168.2.10
+    - name: 开发机 2
+      user: developer
+      host: 192.168.2.11</pre>
+            </div>
+
+            <h4>跳板机配置</h4>
+            <div class="code-block">
+                <pre>- name: 内网服务器
+  user: appuser
+  host: 10.0.1.100
+  port: 22
+  password: innerPassword
+  jump:
+    - user: jumpuser
+      host: 123.45.67.89
+      port: 2222
+      password: jumpPassword</pre>
+            </div>
+
+            <h4>回调命令</h4>
+            <div class="code-block">
+                <pre>- name: 自动化部署服务器
+  user: deploy
+  host: 192.168.8.50
+  password: deployPass
+  callback-shells:
+    - cmd: "cd /app"
+    - delay: 1000
+      cmd: "ls -la"
+    - delay: 500
+      cmd: "echo 'Welcome!'"</pre>
+            </div>
+        </section>
+
+        <!-- 使用指南 -->
+        <section class="content-section">
+            <h2>🚀 使用指南</h2>
+            
+            <h3>基本用法</h3>
+            <div class="code-block">
+                <pre># 启动交互式菜单
+sshw
+
+# 查看版本信息
+sshw -version
+
+# 查看帮助
+sshw -help
+
+# 使用 SSH Config 文件
+sshw -s
+
+# 通过别名快速登录
+sshw dev</pre>
+            </div>
+
+            <h3>交互式操作</h3>
+            <div class="success-box">
+                <h4>🎮 快捷键</h4>
+                <ul>
+                    <li><kbd>↑</kbd> <kbd>↓</kbd> - 上下移动选择</li>
+                    <li><kbd>Enter</kbd> - 确认选择/进入子菜单</li>
+                    <li><kbd>Ctrl+C</kbd> - 取消/退出</li>
+                    <li>直接输入 - 实时搜索过滤</li>
+                    <li>空格分隔 - 多关键词过滤</li>
+                </ul>
+            </div>
+
+            <h3>搜索技巧</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li>输入服务器名称、用户名或主机地址的任意部分进行搜索</li>
+                    <li>使用空格分隔多个关键词，实现精确过滤（如：<code>web 192.168</code>）</li>
+                    <li>搜索实时生效，无需等待</li>
+                    <li>支持 Emoji 字符搜索</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 安全最佳实践 -->
+        <section class="content-section">
+            <h2>🔒 安全最佳实践</h2>
+            
+            <div class="warning-box">
+                <h4>⚠️ 安全提示</h4>
+                <ul>
+                    <li><strong>优先使用 SSH 密钥</strong>：密钥认证比密码更安全</li>
+                    <li><strong>保护配置文件</strong>：设置适当的文件权限（如 <code>chmod 600 ~/.sshw.yml</code>）</li>
+                    <li><strong>使用密码短语</strong>：为 SSH 密钥添加密码短语保护</li>
+                    <li><strong>避免明文密码</strong>：尽量不在配置文件中存储明文密码</li>
+                    <li><strong>定期轮换密钥</strong>：定期更新 SSH 密钥和密码</li>
+                </ul>
+            </div>
+
+            <h3>推荐配置权限</h3>
+            <div class="code-block">
+                <pre># 设置配置文件权限（仅所有者可读写）
+chmod 600 ~/.sshw.yml
+
+# 设置 SSH 密钥权限
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
+
+# 设置 SSH 目录权限
+chmod 700 ~/.ssh</pre>
+            </div>
+        </section>
+
+        <!-- 高级特性 -->
+        <section class="content-section">
+            <h2>🎓 高级特性</h2>
+            
+            <h3>1. SSH Config 集成</h3>
+            <p>使用 <code>-s</code> 参数可以直接读取 <code>~/.ssh/config</code> 文件：</p>
+            <div class="code-block">
+                <pre>sshw -s</pre>
+            </div>
+            <p>SSHW 会自动解析以下配置项：</p>
+            <ul>
+                <li>Host（作为别名）</li>
+                <li>HostName（服务器地址）</li>
+                <li>User（登录用户）</li>
+                <li>Port（SSH 端口）</li>
+                <li>IdentityFile（密钥路径）</li>
+            </ul>
+
+            <h3>2. 多级跳板机</h3>
+            <p>支持通过跳板机访问内网服务器：</p>
+            <div class="highlight-box">
+                <strong>工作原理：</strong>
+                <ol>
+                    <li>先连接到跳板机（Jump Host）</li>
+                    <li>通过跳板机建立到目标服务器的连接</li>
+                    <li>所有流量通过跳板机转发</li>
+                </ol>
+            </div>
+
+            <h3>3. 自动化回调</h3>
+            <p>登录后自动执行预设命令，实现工作流自动化：</p>
+            <div class="code-block">
+                <pre>callback-shells:
+  - cmd: "cd /app"           # 立即执行
+  - delay: 1000              # 等待 1 秒
+    cmd: "git pull"          # 拉取最新代码
+  - delay: 500               # 等待 0.5 秒
+    cmd: "./deploy.sh"       # 执行部署脚本</pre>
+            </div>
+
+            <h3>4. 终端特性</h3>
+            <ul>
+                <li><strong>自动调整大小</strong>：终端窗口大小变化时自动调整</li>
+                <li><strong>保持连接</strong>：每 10 秒发送一次保活心跳</li>
+                <li><strong>完整支持</strong>：支持颜色、光标控制等所有终端特性</li>
+                <li><strong>交互式认证</strong>：支持键盘交互式认证方式</li>
+            </ul>
+
+            <h3>5. 加密套件支持</h3>
+            <p>支持多种加密算法，兼容旧版 SSH 服务器：</p>
+            <div class="code-block">
+                <pre>aes128-ctr, aes192-ctr, aes256-ctr
+aes128-gcm@openssh.com
+chacha20-poly1305@openssh.com
+arcfour256, arcfour128, arcfour
+aes128-cbc, aes192-cbc, aes256-cbc
+3des-cbc, blowfish-cbc, cast128-cbc</pre>
+            </div>
+        </section>
+
+        <!-- 技术实现细节 -->
+        <section class="content-section">
+            <h2>💡 技术实现亮点</h2>
+            
+            <h3>1. 智能认证策略</h3>
+            <p>SSHW 实现了多层次的认证回退机制：</p>
+            <div class="architecture-diagram">
+                <div class="flow-item">
+                    <div class="flow-number">1</div>
+                    <div><strong>SSH 密钥认证</strong> - 优先尝试使用配置的私钥或默认的 ~/.ssh/id_rsa</div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">2</div>
+                    <div><strong>密码认证</strong> - 如果配置了密码，作为备用认证方式</div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">3</div>
+                    <div><strong>交互式认证</strong> - 支持动态输入密码或其他认证信息</div>
+                </div>
+                <div class="flow-item">
+                    <div class="flow-number">4</div>
+                    <div><strong>终端密码输入</strong> - 如果所有方式失败，提示用户手动输入密码</div>
+                </div>
+            </div>
+
+            <h3>2. 层级菜单系统</h3>
+            <ul>
+                <li>支持无限层级的服务器分组</li>
+                <li>自动添加 "返回上级" 选项</li>
+                <li>记住父级上下文，实现正确的返回导航</li>
+                <li>美观的显示模板，突出活动项</li>
+            </ul>
+
+            <h3>3. 智能搜索算法</h3>
+            <div class="code-block">
+                <pre>// 搜索逻辑
+1. 合并服务器名称、用户名、主机地址为搜索内容
+2. 支持空格分隔的多关键词搜索
+3. 所有关键词都必须匹配（AND 逻辑）
+4. 实时过滤，无延迟</pre>
+            </div>
+
+            <h3>4. 跳板机代理实现</h3>
+            <p>使用 SSH 客户端嵌套实现跳板机功能：</p>
+            <div class="highlight-box">
+                <ol>
+                    <li>建立到跳板机的 SSH 连接</li>
+                    <li>通过跳板机的连接创建到目标服务器的 TCP 连接</li>
+                    <li>在该 TCP 连接上建立新的 SSH 客户端连接</li>
+                    <li>用户操作透明地通过两层连接传输</li>
+                </ol>
+            </div>
+
+            <h3>5. 终端状态管理</h3>
+            <ul>
+                <li><strong>Raw 模式</strong>：切换终端到 Raw 模式，直接传递按键</li>
+                <li><strong>窗口监控</strong>：独立 goroutine 每秒检测窗口大小变化</li>
+                <li><strong>保活心跳</strong>：独立 goroutine 定期发送 keepalive 请求</li>
+                <li><strong>输入输出</strong>：异步处理，避免阻塞</li>
+                <li><strong>状态恢复</strong>：退出时恢复终端原始状态</li>
+            </ul>
+        </section>
+
+        <!-- 常见问题 -->
+        <section class="content-section">
+            <h2>❓ 常见问题</h2>
+            
+            <h3>Q: 为什么无法连接到服务器？</h3>
+            <div class="highlight-box">
+                <p><strong>A:</strong> 请检查：</p>
+                <ul>
+                    <li>服务器地址和端口是否正确</li>
+                    <li>网络是否可达（可用 <code>ping</code> 测试）</li>
+                    <li>密钥文件路径是否正确</li>
+                    <li>密钥文件权限是否为 600</li>
+                    <li>用户名和密码是否正确</li>
+                </ul>
+            </div>
+
+            <h3>Q: 如何避免在配置文件中存储明文密码？</h3>
+            <div class="highlight-box">
+                <p><strong>A:</strong> 推荐以下方案：</p>
+                <ul>
+                    <li>使用 SSH 密钥认证，不配置 password 字段</li>
+                    <li>省略 password 字段，SSHW 会在需要时提示输入</li>
+                    <li>使用操作系统的密钥链管理工具</li>
+                    <li>设置配置文件权限为 600，限制访问</li>
+                </ul>
+            </div>
+
+            <h3>Q: 搜索功能不工作怎么办？</h3>
+            <div class="highlight-box">
+                <p><strong>A:</strong> 搜索会匹配服务器名称、用户名和主机地址。确保：</p>
+                <ul>
+                    <li>输入的关键词在这三个字段中存在</li>
+                    <li>多关键词用空格分隔</li>
+                    <li>所有关键词都必须匹配</li>
+                </ul>
+            </div>
+
+            <h3>Q: 可以同时打开多个 SSH 连接吗？</h3>
+            <div class="highlight-box">
+                <p><strong>A:</strong> 可以。在不同的终端窗口中分别运行 <code>sshw</code> 即可建立多个独立的 SSH 会话。</p>
+            </div>
+
+            <h3>Q: 支持 Windows 系统吗？</h3>
+            <div class="highlight-box">
+                <p><strong>A:</strong> 理论上支持，但终端相关功能在 Windows 上可能需要使用 WSL 或 Git Bash 等环境。建议在 Linux/macOS 上使用以获得最佳体验。</p>
+            </div>
+        </section>
+
+        <!-- 项目信息 -->
+        <section class="content-section">
+            <h2>📊 项目信息</h2>
+            
+            <table>
+                <tr>
+                    <td><strong>项目名称</strong></td>
+                    <td>SSHW (SSH Wrapper)</td>
+                </tr>
+                <tr>
+                    <td><strong>开发语言</strong></td>
+                    <td>Go 1.23+</td>
+                </tr>
+                <tr>
+                    <td><strong>许可证</strong></td>
+                    <td>MIT License</td>
+                </tr>
+                <tr>
+                    <td><strong>仓库地址</strong></td>
+                    <td><a href="https://github.com/yinheli/sshw" target="_blank">github.com/yinheli/sshw</a></td>
+                </tr>
+                <tr>
+                    <td><strong>主要依赖</strong></td>
+                    <td>
+                        • golang.org/x/crypto/ssh<br>
+                        • github.com/manifoldco/promptui<br>
+                        • gopkg.in/yaml.v2<br>
+                        • github.com/kevinburke/ssh_config
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>核心文件</strong></td>
+                    <td>
+                        • cmd/sshw/main.go (456 行)<br>
+                        • client.go (284 行)<br>
+                        • config.go (147 行)<br>
+                        • log.go (54 行)
+                    </td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 贡献指南 -->
+        <section class="content-section">
+            <h2>🤝 贡献指南</h2>
+            
+            <p>欢迎贡献代码、报告问题或提出建议！</p>
+            
+            <h3>如何贡献</h3>
+            <div class="installation-steps">
+                <div class="installation-step">
+                    <h4>Fork 项目</h4>
+                    <p>在 GitHub 上 Fork 本项目到你的账户</p>
+                </div>
+                <div class="installation-step">
+                    <h4>克隆代码</h4>
+                    <div class="code-block">
+                        <pre>git clone https://github.com/your-username/sshw.git
+cd sshw</pre>
+                    </div>
+                </div>
+                <div class="installation-step">
+                    <h4>创建分支</h4>
+                    <div class="code-block">
+                        <pre>git checkout -b feature/your-feature-name</pre>
+                    </div>
+                </div>
+                <div class="installation-step">
+                    <h4>开发测试</h4>
+                    <p>进行开发并确保代码通过测试</p>
+                    <div class="code-block">
+                        <pre>go build ./cmd/sshw
+./sshw -version</pre>
+                    </div>
+                </div>
+                <div class="installation-step">
+                    <h4>提交代码</h4>
+                    <div class="code-block">
+                        <pre>git add .
+git commit -m "Add: your feature description"
+git push origin feature/your-feature-name</pre>
+                    </div>
+                </div>
+                <div class="installation-step">
+                    <h4>创建 Pull Request</h4>
+                    <p>在 GitHub 上创建 Pull Request 并描述你的改动</p>
+                </div>
+            </div>
+
+            <h3>开发建议</h3>
+            <ul>
+                <li>保持代码简洁清晰</li>
+                <li>添加必要的注释</li>
+                <li>遵循 Go 语言规范</li>
+                <li>测试新功能</li>
+                <li>更新相关文档</li>
+            </ul>
+        </section>
+
+        <!-- 未来规划 -->
+        <section class="content-section">
+            <h2>🔮 未来规划</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">🔐</div>
+                    <h3>密码管理器集成</h3>
+                    <p>集成 1Password、LastPass 等密码管理器</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📝</div>
+                    <h3>会话记录</h3>
+                    <p>自动记录 SSH 会话日志，便于审计</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🌍</div>
+                    <h3>多语言支持</h3>
+                    <p>添加国际化支持，支持多种语言</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📱</div>
+                    <h3>移动端适配</h3>
+                    <p>优化在移动终端上的使用体验</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔄</div>
+                    <h3>配置同步</h3>
+                    <p>云端配置同步，多设备共享</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>连接统计</h3>
+                    <p>记录连接历史和使用统计</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Made with ❤️ by the SSHW community</p>
+        <p style="margin-top: 10px;">
+            <a href="https://github.com/yinheli/sshw" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">
+                ⭐ Star on GitHub
+            </a>
+        </p>
+        <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9em;">
+            © 2025 SSHW Project | Licensed under MIT
+        </p>
+    </footer>
+</body>
+</html>
