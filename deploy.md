@@ -76,4 +76,6 @@ export GITHUB_TOKEN="your_github_token"
 # 或者在发布时指定
 GITHUB_TOKEN="your_token" goreleaser release --clean
 ```
+# 安装
 
+cp ./dist/sshw_darwin_arm64/sshw /usr/local/bin/sshw

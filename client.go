@@ -212,7 +212,11 @@ func (c *defaultClient) Login() {
 		ssh.TTY_OP_ISPEED: 14400,
 		ssh.TTY_OP_OSPEED: 14400,
 	}
-	err = session.RequestPty("xterm", h, w, modes)
+	// xterm-256color - 支持 256 色
+	// screen - 适用于 screen 会话
+	// tmux - 适用于 tmux 会话
+	// vt100 - 基础终端类型
+	err = session.RequestPty("xterm-256color", h, w, modes)
 	if err != nil {
 		l.Error(err)
 		return
