@@ -24,6 +24,9 @@ goreleaser release --clean
 
 # 5. 正式发布（保留之前的构建产物）
 goreleaser release
+
+goreleaser release --snapshot --clean
+
 ```
 
 完整发布流程：
